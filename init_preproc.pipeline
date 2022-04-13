@@ -1,0 +1,50 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonBuilder
+
+def home_dir=System.getenv("PWD")
+def prog_dir=System.getenv("RIBOSTREAM_HOME")
+
+load (home_dir + "/config.ini")
+load (prog_dir + "/utils/utils.groovy")
+
+load (prog_dir + "/modules/sradownload.groovy")
+load (prog_dir + "/modules/fastqc.groovy")
+load (prog_dir + "/modules/trimming.groovy")
+load (prog_dir + "/modules/multiqc.groovy")
+load (prog_dir + "/modules/umi_tools.groovy")
+
+
+if (SRA) {
+	run {
+		"configs/%_preproc.json" * [load_json.using(module:"preproc") +
+		fastqdump +
+		fastQC +
+		save_json.using(module:"trim")] +
+		generateCSV.using(module:"trim") +
+		"configs/%_trim.json" * [load_json.using(module:"trim") +
+		modifyJSON.using(module:"trim") +
+		umi +
+		trim +
+		save_json.using(module:"alignment")] +
+		multiQC.using(module:"fastqc") +
+		multiQC.using(module:"trimmed") +
+		generateCSV.using(module:"alignment")
+	}
+
+} else {
+	run {
+		"configs/%_preproc.json" * [load_json.using(module:"preproc") +
+		fastQC +
+		save_json.using(module:"trim")] +
+		generateCSV.using(module:"trim") +
+		"configs/%_trim.json" * [load_json.using(module:"trim") +
+		modifyJSON.using(module:"trim") +
+		umi_extract +
+		trim +
+		save_json.using(module:"alignment")] +
+		multiQC.using(module:"fastqc") +
+		multiQC.using(module:"trimmed") +
+		generateCSV.using(module:"alignment")
+	}
+
+}
