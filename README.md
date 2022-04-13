@@ -1,6 +1,8 @@
 # RiboStream
 RiboStream is a compact Bpipe pipeline for processing and quality control of Ribo-Seq data, typically paired with corresponding bulk RNA-Seq samples. 
 
+<img width="686" alt="Screenshot 2022-04-13 at 10 44 25" src="https://user-images.githubusercontent.com/32344189/163148902-a001afab-7937-451f-877a-dd06a6423335.png">
+
 ### Installation 
 You can use GitHub to download the developer version of the pipeline or use the [lastest release]. To download the developer version:
 
