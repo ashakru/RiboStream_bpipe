@@ -9,6 +9,7 @@ You can use GitHub to download the developer version of the pipeline or use the 
 ```{bash}
 gh repo clone ashakru/RiboStream
 ```
+
 The RiboStream folder can be added to your `PATH`, so that you can access RiboStream executables from anywhere in your machine. You can do it, for example, following this [tutorial](https://www.howtogeek.com/658904/how-to-add-a-directory-to-your-path-in-linux/)
 
 ### Dependencies
@@ -68,13 +69,13 @@ Next step is to create Bowtie2 and STAR indexes for the reference genome. They c
 ##### Bowtie2
 Bowtie2 is used to prealign trimmed Ribo-Seq reads to a set of non-coding RNAs. The advantage of this extra data purification step is an increase in the proportion of true ribosome-derived mRNA footprints in the final BAM file. This facilitates the interpretation of characteristic periodical alignment pattern of Ribo-Seq reads and improves the estimation of the ribosomal P-site location. Additional benefit is smaller size of the final output file that accelerates further processing. Reference sequences of rRNA, tRNA and snoRNA can be downloaded from RefSeq, see an example FASTA file in `test/ref` folder in this GitHub repository. To create Bowtie2 index plese refer to the original Bowtie2 manual. An example command used to create Bowtie2 index for RiboStream tests was:
 ```{bash}
-bowtie2 index 
+bowtie2-build ncRNA_all.fa ncRNA_all
 ```
 
 ##### STAR
 RiboStream uses STAR to align both Ribo-Seq and RNA-Seq read to the reference genome. You can build your STAR index with any reference sequence. For example, reference genome for human and mouse can be downloaded from [Gencode](https://www.gencodegenes.org). An example command used to create STAR index for RiboStream tests was:
 ```{bash}
-STAR index 
+STAR --runThreadN 8 --runMode genomeGenerate --genomeDir STAR_hg38_gencodev29 --genomeFastaFiles gencode.v29/GRCh38.primary_assembly.genome.fa --sjdbGTFfile gencode.v29/gencode.v29.annotation.gtf --sjdbOverhang 49
 ```
 
 #### 5. GTF file with reference gene models  
@@ -88,14 +89,20 @@ RiboStream stores all parameters of the run in a single config file called `conf
 Full RiboStream workflow includes running two scripts: `RiboStream_preproc.sh` and `RiboStream_alignment.sh`. 
 
 `RiboStream_preproc.sh` performs a standard quality check of sequenced reads with FASTQC, UMI-based deduplication (optional) and basic adapter trimming with Trimmomatic. FASTQC and trimming reports are collected into a single MultiQC report. 
+```
+RiboStream_preproc.sh sampleSheet_myexperiment.csv
+```
 
  `RiboStream_alignment.sh` performs the core RiboStream analysis. Here, trimmed Ribo-Seq FASTQ files are first prealigned with Bowtie2 to a reference set of non-coding RNAs, such as rRNA, tRNA and snoRNA. Then, all samples are aligned to the reference genome with STAR. Obtained BAM files are sorted, indexed and uniquely mapping reads are selected. If needed, technical replicates can be merged, as specified in the sample sheet. 
- 
+```
+RiboStream_alignment.sh sampleSheet_alignment.csv
+```
+
 By separating RiboStream workflow into two stages, it is possible to evaluate the quality of the data before the core analysis starts and perform extra steps (eg. additional reads trimming), if neccessary. 
 
 ### Compatibility with HPC
 
-### RiboStream customization 
+Bpipe framework can work with a variety of resource manager systems. See [Bpipe documentation](http://docs.bpipe.org/Guides/ImplementingAResourceManager/) for details and [this tutorial](http://docs.bpipe.org/Guides/Configuration/) for setting a Bpipe configuration file.  
 
 ### Support and future development
 
@@ -107,4 +114,5 @@ If you would like to contibute to the RiboStream project facilitating standarisa
 1. Support for paired-end RNA-Seq analysis
 2. Singularity container 
 3. Automated differential translation analysis
-4. Compatibility with public databases storing processed Ribo-Seq data
+4. Detailed RiboStream documentation 
+5. A post about troubleshooting the most common problems with Ribo-Seq analysis 
