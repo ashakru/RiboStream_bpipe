@@ -7,13 +7,16 @@ source /etc/profile.d/modules.sh
 home_dir=$PWD
 prog_dir=$RIBOSTREAM_HOME
 
+echo $prog_dir
+echo $home_dir
+
 #Check if a directory with fastq files exists
 dir="fastq"
 if [[ ! -e $dir ]]; then
     mkdir $dir
 elif [[ ! -d $dir ]]; then
     echo "$dir already exists but is not a directory" 1>&2
-fi #
+fi
 
 #Check if configs directory (with all setting for each tool used)
 dir="configs"

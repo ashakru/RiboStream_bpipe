@@ -19,7 +19,7 @@ fastqdump = {
 
   folder_check('fastq')
 
-  output.dir =  "${home_dir}/fastq"
+  output.dir =  "fastq"
   def outputs = "${ID}"+".fastq.gz"
 
 	produce("${ID}.fastq.gz"){
