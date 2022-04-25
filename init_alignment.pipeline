@@ -1,0 +1,36 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonBuilder
+
+def home_dir=System.getenv("PWD")
+def prog_dir=System.getenv("RIBOSTREAM_HOME")
+
+load (home_dir + "/config.ini")
+
+load (prog_dir + "/modules/alignment.groovy")
+load (prog_dir + "/modules/prealignment.groovy")
+load (prog_dir + "/modules/merging.groovy")
+load (prog_dir + "/modules/bamshuf.groovy")
+load (prog_dir + "/modules/salmon.groovy")
+load (prog_dir + "/modules/tximport.groovy")
+load (prog_dir + "/modules/samtools.groovy")
+load (prog_dir + "/modules/deeptools.groovy")
+load (prog_dir + "/modules/counting.groovy")
+
+run  {
+	"configs/%_alignment.json" * [load_json.using(module:"alignment") +
+	save_json.using(module:"merge")] +
+	"configs/%_merge.json" * [load_json.using(module:"merge") +
+	modifyJSON.using(module:"merge") +
+	merging.using(module:"fastq") +
+	prealignment +
+	alignment +
+	salmon +
+	uniqueBam +
+	indexBam +
+	bamCoverage +
+	computeMatrix +
+	plotProfile] +
+	"configs/%_experiment.json" * [load_json.using(module:"experiment") +
+	tximport] +
+	counting 
+}
